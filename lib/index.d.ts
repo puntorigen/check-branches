@@ -12,6 +12,7 @@ export default class check_branches {
     });
     getCurrentBranch(): Promise<any>;
     getBranches(): Promise<String[]>;
+    getBranchContributors(branch: String, min_percentage?: Number): Promise<any[]>;
     check(branch?: String): Promise<void>;
     install(arg: any): Promise<void>;
 }

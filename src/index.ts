@@ -9,6 +9,8 @@ const process = require('process');
 const branch = require('git-branch');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
+const extractjs = require('extractjs');
+let extractor = extractjs();
 const open_console = require('@concepto/console');
 const x_console = new open_console();
 //
@@ -20,6 +22,7 @@ export default class check_branches {
 	constructor(arg:{silent?:boolean,workdir?:String}={silent:true,workdir:process.cwd() }) {
         this.workdir = arg.workdir;
         this.silent = arg.silent;
+        x_console.setSilent(this.silent);
     }
 
     async getCurrentBranch() {
@@ -46,19 +49,62 @@ export default class check_branches {
         return resp;
     }
 
-    async check(branch?:String) {
-        let arg = { branch:branch, branches:[] };
-        if (arg.branch && arg.branch.trim()!='') console.log('repo->'+branch);
-        if (!arg.branch || arg.branch.trim()=='') {
-            try {
-                arg.branch = await this.getCurrentBranch();
-            } catch(ee) {
-                x_console.out({ color:'red', message:'Error: no git repo found on current directory!' });
-                return;
+    async getBranchContributors(branch:String,min_percentage?:Number) {
+        //returns the given branch contributors
+        let resp = [];
+        let commits = (await exec(`git log --pretty="%an %ae" --first-parent ${branch}`)).stdout.split('\n');
+        const commits_length = commits.length;
+        // group and count commits
+        let grouped = {}, passed = {};
+        for (let commit of commits) {
+            let [name,email] = commit.split(' ');
+            if (!passed[name]) {
+                let entries = commits.filter(entry=>entry.indexOf(name)>-1 && entry.indexOf(email)>-1);
+                let percentage = (entries.length/commits_length*100);
+                let percent = parseFloat(Math.max(0.1, percentage).toFixed(1));
+                resp.push({
+                    commits: entries.length,
+                    name,
+                    email,
+                    percent
+                });
+                passed[name] = true;
             }
+        }
+        //@todo: sort and filter by percentage
+        return resp;
+    }
+
+    async check(branch?:String) {
+        let arg = { branch:branch, branches:[], branch_current:'', bak_branch:'' };
+        if (arg.branch && arg.branch.trim()!='') console.log('repo->'+branch);
+        if (!arg.branch) arg.branch='';
+        try {
+            arg.branch_current = await this.getCurrentBranch();
+            if (arg.branch!='' && arg.branch!=arg.branch_current) {
+                arg.bak_branch=arg.branch_current;
+            }
+            arg.branch = arg.branch_current;
+        } catch(ee) {
+            x_console.out({ color:'red', message:'Error: no git repo found on current directory!' });
+            return;
         }
         console.log('');
         //end required arguments
+        //change to target branch
+        if (arg.bak_branch!='') {
+            try {
+                await exec('git checkout --track origin/'+arg.branch); //try remote branch first
+            } catch(errc) {
+                try {
+                    //maybe its just a local branch
+                    await exec('git checkout '+arg.branch);
+                } catch(errc2) {
+                }
+            }
+        }
+        //get current branch contributors
+        let my_branch_contrib = await this.getBranchContributors('origin/'+arg.branch,10);
         //get current repo branches
         console.log('reading branches ..');
         arg.branches = await this.getBranches();
@@ -84,12 +130,18 @@ export default class check_branches {
         for (let branch of arg.branches) {
             try {
                 bar.update(count_);
+                //get branch contributors
+                let contri = await this.getBranchContributors('origin/'+branch,10);
+                //
                 const { stdout, stderr } = await exec(`git merge origin/${branch} --no-ff --no-commit || git merge --abort`);
                 //console.log(`testing ${branch}`,{ stdout, stderr });
                 for (let line of stdout.split('\n')) {
                     if (line.indexOf('CONFLICT')!=-1) {
-                        if (!conflicts[branch]) conflicts[branch]=[];
-                        conflicts[branch].push(line.replace('HEAD',arg.branch).replace('origin/',''));
+                        if (!conflicts[branch]) conflicts[branch]={ conflicts:[] };
+                        conflicts[branch].contributors = contri.filter((item)=>item.percent>10);
+                        let clean_text = line.replaceAll('HEAD',arg.branch).replaceAll('origin/','');
+                        let captured = extractor('CONFLICT ({type}): {explanation}',clean_text);
+                        conflicts[branch].conflicts.push(captured);
                     }
                     //console.log('line',line);
                 }
@@ -99,10 +151,16 @@ export default class check_branches {
             }
         }
         bar.stop();
-        //
-        //console.log('repo branches',arg.branches);
-        console.log('conflicts found',conflicts);
-        //console.log('args obj',arg);
+        //restore original branch
+        if (arg.bak_branch!='') {
+            try {
+                //console.log('restoring original active local branch '+arg.bak_branch);
+                await exec('git checkout '+arg.bak_branch);
+            } catch(errc2) {
+            }
+        }
+        //show report
+        x_console.out({ message:'conflicts found', data:conflicts });
     }
 
     async install(arg:any) {
