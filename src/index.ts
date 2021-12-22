@@ -34,6 +34,7 @@ export default class check_branches {
             let lines = str.trim().split(os.EOL);
             let res:Array<String> = [];
             for (let i = 0; i < lines.length; i++) {
+                //console.log('lines['+i+']',lines[i]);
                 let line = lines[i].trim().replace(/^\*\s*/, '');
                 let line0 = line.split('/').pop();
                 if (res.includes(line0)==false) res.push(line0);
@@ -59,6 +60,7 @@ export default class check_branches {
         console.log('');
         //end required arguments
         //get current repo branches
+        console.log('reading branches ..');
         arg.branches = await this.getBranches();
         //remove 'branch' from 'branches'
         let pos = arg.branches.indexOf(arg.branch);
@@ -68,12 +70,39 @@ export default class check_branches {
             return;
         }
         //for each branch
-        for (let branch in arg.branches) {
-            console.log(branch);
-        }
+        let conflicts = {};
+        const progress = require('cli-progress');
+        const bar = new progress.SingleBar({
+            format: 'checking branches {bar} | {percentage}% | ETA: {eta}s',
+            hideCursor: true,
+            clearOnComplete: true
+        }, progress.Presets.shades_classic);
+        bar.start(100,0);
+        bar.setTotal(arg.branches.length);
         //
-        console.log('repo branches',arg.branches);
-        console.log('args obj',arg);
+        let count_ = 0;
+        for (let branch of arg.branches) {
+            try {
+                bar.update(count_);
+                const { stdout, stderr } = await exec(`git merge origin/${branch} --no-ff --no-commit || git merge --abort`);
+                //console.log(`testing ${branch}`,{ stdout, stderr });
+                for (let line of stdout.split('\n')) {
+                    if (line.indexOf('CONFLICT')!=-1) {
+                        if (!conflicts[branch]) conflicts[branch]=[];
+                        conflicts[branch].push(line.replace('HEAD',arg.branch).replace('origin/',''));
+                    }
+                    //console.log('line',line);
+                }
+                count_ += 1;
+            } catch(err) {
+                //console.log(`error ${branch}`,err);
+            }
+        }
+        bar.stop();
+        //
+        //console.log('repo branches',arg.branches);
+        console.log('conflicts found',conflicts);
+        //console.log('args obj',arg);
     }
 
     async install(arg:any) {
