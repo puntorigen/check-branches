@@ -1,7 +1,7 @@
 {
   "name": "check-branches",
   "version": "0.0.1",
-  "description": "CLI to automatically check if your current repo branch has any conflicts with all other repo's branches. Really useful when working with teams of lots of people.",
+  "description": "CLI to automatically check if your current repo branch has any conflicts with all other repo's branches. Really useful when working with big teams.",
   "keywords": [
     "git",
     "branch",
