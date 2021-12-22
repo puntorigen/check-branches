@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+process.env.UV_THREADPOOL_SIZE=8*require('os').cpus().length;
+//const cli = require('command-line-args');
+const open_console = require('@concepto/console');
+const pkg = require('../package.json');
+const helper = require('../lib/index');
+const cmds = require('minimist')(process.argv.slice(2));
+//console.log('argumentos',cmds);
+/* */
+(async () => {
+    // testing code here
+    //let file = (myArgs.length>0)?myArgs[0]:'vue.dsl';
+    //let debug = (myArgs.length>1)?eval(myArgs[1].trim()):false;
+    let x_console = new open_console();
+    let x_helper = new helper();
+    
+    //let serial = await getSerial();
+    let printUsage = function() {
+        x_console.out({ message:'Usage:', color:'brightCyan' });
+        x_console.out({ message:'check-branches <branch>', color:'yellow' });
+        console.log('');
+        x_console.out({ message:'Options:', color:'brightCyan' });
+        x_console.out({ message:'-h, --help\t\t\tOutputs usage information', color:'cyan' });
+        console.log('');
+        //copyright
+        x_console.out({ message:`© 2021, Pablo Schaffner. Free to use anytime, anywhere.`, color:'dim' });
+    };
+    x_console.title({ title:`check-branches CLI v${pkg.version}`, titleColor:'brightYellow', color:'green' });
+    if (cmds.h || cmds.help) {
+        printUsage();
+    } else {
+        let branch = await x_helper.getCurrentBranch();
+        console.log('current repo branch',branch);
+        //cmds._[0] has the branch name
+        //printUsage(cmds._[0]);
+    }
+
+})().catch(err => {
+    console.error(err);
+});
+/* */

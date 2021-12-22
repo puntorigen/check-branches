@@ -1,0 +1,64 @@
+{
+  "name": "check-branches",
+  "version": "0.0.1",
+  "description": "CLI to automatically check if your current repo branch has any conflicts with all other repo's branches. Really useful when working with teams of lots of people.",
+  "keywords": [
+    "git",
+    "branch",
+    "checkout",
+    "compare",
+    "conflicts",
+    "puntorigen",
+    "cli"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "lib/index.js",
+  "bin": "bin/cli",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development rollup -c",
+    "build": "cross-env NODE_ENV=production rollup -c && npm run docs",
+    "docs": "jsdoc2md -t README.hbs lib/*.js > README.md"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puntorigen/check-branches.git"
+  },
+  "author": "Pablo Schaffner",
+  "license": "MIT",
+  "bugs": {
+    "mail": "pablo@puntorigen.com",
+    "url": "https://github.com/puntorigen/check-branches/issues"
+  },
+  "homepage": "https://github.com/puntorigen/check-branches#readme",
+  "dependencies": {
+    "@concepto/console": "*",
+    "cli-progress": "^3.9.1",
+    "download-file-with-progressbar": "^1.2.3",
+    "fs-extra": "^10.0.0",
+    "git-branch": "^2.0.1",
+    "minimist": "^1.2.5",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "@rollup/plugin-babel": "^5.1.0",
+    "@rollup/plugin-node-resolve": "^8.4.0",
+    "@types/node": "^16.11.15",
+    "cross-env": "^7.0.2",
+    "jsdoc-to-markdown": "^7.0.0",
+    "rollup": "^2.23.1",
+    "rollup-plugin-typescript2": "^0.31.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.2"
+  },
+  "scarfSettings": {
+    "enabled": false
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  }
+}
