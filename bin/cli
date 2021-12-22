@@ -21,19 +21,21 @@ const cmds = require('minimist')(process.argv.slice(2));
         console.log('');
         x_console.out({ message:'Options:', color:'brightCyan' });
         x_console.out({ message:'-h, --help\t\t\tOutputs usage information', color:'cyan' });
-        console.log('');
         //copyright
+        console.log('');
         x_console.out({ message:`© 2021, Pablo Schaffner. Free to use anytime, anywhere.`, color:'dim' });
     };
     x_console.title({ title:`check-branches CLI v${pkg.version}`, titleColor:'brightYellow', color:'green' });
     if (cmds.h || cmds.help) {
         printUsage();
     } else {
-        let branch = await x_helper.getCurrentBranch();
-        console.log('current repo branch',branch);
-        //cmds._[0] has the branch name
-        //printUsage(cmds._[0]);
+        if (cmds._.length>0) {
+            await x_helper.check(cmds._[0]);
+        } else {
+            await x_helper.check();
+        }
     }
+    console.log('');
 
 })().catch(err => {
     console.error(err);

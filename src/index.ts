@@ -4,10 +4,12 @@
 * @module 	check_branches
 **/
 
-const open_console = require('@concepto/console');
-const prompts = require('prompts');
+//const prompts = require('prompts');
 const process = require('process');
 const branch = require('git-branch');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
+const open_console = require('@concepto/console');
 const x_console = new open_console();
 //
 
@@ -25,22 +27,45 @@ export default class check_branches {
         return resp;
     }
 
-    async check(branch:String=null) {
-        let arg = { branch };
-        if (branch) console.log('repo->'+branch);
-        console.log('');
-        //required arguments
-        if (!branch) arg.branch = (await prompts({
-            type: 'text',
-            name: 'value',
-            message: `What's the branch name you wish to check`,
-            validate: value => {
-                if (value.length<3) return `Name to short!`;
-                if (value.trim().indexOf(' ')!=-1) return `Name cannot contain spaces!`;
-                return true; 
+    async getBranches() {
+        let parseBranches = (str) => {
+            if (!str) return [];
+            const os = require('os');
+            let lines = str.trim().split(os.EOL);
+            let res:Array<String> = [];
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim().replace(/^\*\s*/, '');
+                let line0 = line.split('/').pop();
+                if (res.includes(line0)==false) res.push(line0);
             }
-        })).value;
-        console.log('received args',arg);
+            return res;
+        };
+        const { stdout, stderr } = await exec('git branch -a');
+        const resp = parseBranches(stdout);
+        return resp;
+    }
+
+    async check(branch?:String) {
+        let arg = { branch:branch, branches:[] };
+        if (arg.branch && arg.branch.trim()!='') console.log('repo->'+branch);
+        if (!arg.branch || arg.branch.trim()=='') {
+            try {
+                arg.branch = await this.getCurrentBranch();
+            } catch(ee) {
+                x_console.out({ color:'red', message:'Error: no git repo found on current directory!' });
+                return;
+            }
+        }
+        console.log('');
+        //end required arguments
+        //get current repo branches
+        arg.branches = await this.getBranches();
+        if (arg.branches.length==1 && arg.branch==arg.branches[0]) {
+            x_console.out({ color:'red', message:'Error: there is only 1 branch on this repo. Nothing to check!' });
+            return;
+        }
+        console.log('repo branches',arg.branches);
+        console.log('args obj',arg);
     }
 
     async install(arg:any) {

@@ -4,6 +4,6 @@
       "declaration": true,
       "declarationDir": "./lib",
       "declarationMap": true,
-      "target": "ES5"
+      "target": "es2016"
     }
   }

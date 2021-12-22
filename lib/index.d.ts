@@ -11,6 +11,7 @@ export default class check_branches {
         workdir?: String;
     });
     getCurrentBranch(): Promise<any>;
+    getBranches(): Promise<String[]>;
     check(branch?: String): Promise<void>;
     install(arg: any): Promise<void>;
 }
