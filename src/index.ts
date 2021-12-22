@@ -152,9 +152,9 @@ export default class check_branches {
         let pos = arg.branches.indexOf(arg.branch);
         arg.branches.splice(pos,1);
         if (arg.branches.length==0) {
-            if (!this.silent) x_console.out({ color:'red', message:'Error: there is only 1 branch on this repo. Nothing to check!' });
+            //if (!this.silent) x_console.out({ color:'red', message:'Error: there is only 1 branch on this repo. Nothing to check!' });
             if (this.silent) new Error('Error: there is only 1 branch on this repo. Nothing to check!'); 
-            if (!this.silent) spinner.fail('There is only 1 branch on this repo');
+            if (!this.silent) spinner.fail('Error! There is only 1 branch on this repo!');
             return;
         }
         //for each branch
