@@ -138,8 +138,12 @@ export default class check_branches {
             }
         }
         //get current branch contributors
-        let my_branch_contrib = await this.getBranchContributors('origin/'+arg.branch,10);
-        let my_contribs = my_branch_contrib.map((item)=>item.email);
+        let my_contribs = [];
+        try {
+            let my_branch_contrib = await this.getBranchContributors('origin/'+arg.branch,10);
+            my_contribs = my_branch_contrib.map((item)=>item.email);
+        } catch(my_contrib_err) {
+        }
         //get current repo branches
         let spinner = x_console.spinner({ message:'reading branches ..', color:'yellow' });
         if (!this.silent) spinner.start();
