@@ -13,7 +13,7 @@ export default class check_branches {
     getCurrentBranch(): Promise<any>;
     getBranches(): Promise<String[]>;
     getBranchContributors(branch: String, min_percentage?: Number): Promise<any[]>;
+    generateReport(repo: String, branch: String, conflicts: any): Promise<void>;
     check(branch?: String): Promise<void>;
-    install(arg: any): Promise<void>;
 }
 //# sourceMappingURL=index.d.ts.map

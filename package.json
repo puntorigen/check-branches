@@ -1,6 +1,6 @@
 {
   "name": "check-branches",
-  "version": "0.0.15",
+  "version": "0.0.17",
   "description": "CLI to automatically check if your current repo branch has any conflicts with all other repo's branches. Really useful when working with big teams.",
   "keywords": [
     "git",
@@ -40,8 +40,8 @@
     "extractjs": "^0.3.1",
     "fs-extra": "^10.0.0",
     "git-branch": "^2.0.1",
-    "minimist": "^1.2.5",
-    "prompts": "^2.4.2"
+    "git-repo-name": "^1.0.1",
+    "minimist": "^1.2.5"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",

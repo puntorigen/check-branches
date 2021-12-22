@@ -12,7 +12,7 @@ const cmds = require('minimist')(process.argv.slice(2));
     //let file = (myArgs.length>0)?myArgs[0]:'vue.dsl';
     //let debug = (myArgs.length>1)?eval(myArgs[1].trim()):false;
     let x_console = new open_console();
-    let x_helper = new helper();
+    let x_helper = new helper({ silent:false });
     
     //let serial = await getSerial();
     let printUsage = function() {
