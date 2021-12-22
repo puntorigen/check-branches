@@ -1,8 +1,8 @@
-# check-branches [![NPM version](https://img.shields.io/npm/v/check-branches.svg?style=flat)](https://www.npmjs.com/package/check-branches) [![NPM monthly downloads](https://img.shields.io/npm/dm/check-branches.svg?style=flat)](https://npmjs.org/package/check-branches) [![NPM total downloads](https://img.shields.io/npm/dt/check-branches.svg?style=flat)](https://npmjs.org/package/check-branches)
+# check-branches<br/> [![NPM version](https://img.shields.io/npm/v/check-branches.svg?style=flat)](https://www.npmjs.com/package/check-branches) [![NPM monthly downloads](https://img.shields.io/npm/dm/check-branches.svg?style=flat)](https://npmjs.org/package/check-branches) [![NPM total downloads](https://img.shields.io/npm/dt/check-branches.svg?style=flat)](https://npmjs.org/package/check-branches)
 
-> CLI to automatically check if your current repo branch has any conflicts with all other repo's branches. Really useful when working with teams of lots of people.
+> CLI to automatically check if your current repo branch has any conflicts with all other repo's branches. Really useful when working with big teams.
 
-Please consider following this project's author, [Jon Schlinkert](https://github.com/puntorigen), and consider starring the project to show your :heart: and support.
+Please consider following this project's author, [Pablo Schaffner](https://github.com/puntorigen), and consider starring the project to show your :heart: and support.
 
 ## Install
 
